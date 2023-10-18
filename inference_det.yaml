@@ -3,13 +3,13 @@ Global:
   det_inference_model_dir: "picodet_PPLCNet_x2_5_mainbody_lite_v1.0_infer"
   batch_size: 1
   image_shape: [3, 640, 640]
-  threshold: 0.2
+  threshold: 0.5
   max_det_results: 1
   label_list:
     - foreground
 
   # inference engine config
-  use_gpu: False
+  use_gpu: True
   enable_mkldnn: True
   cpu_num_threads: 10
   enable_benchmark: True

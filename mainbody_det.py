@@ -32,6 +32,7 @@ from paddleclas.deploy.python.det_preprocess import det_preprocess
 # args = config.parse_args()
 config = config.get_config('inference_det.yaml', show=True)
 
+
 class DetPredictor(Predictor):
     def __init__(self, config):
         super().__init__(config["Global"],
@@ -131,23 +132,44 @@ class DetPredictor(Predictor):
                 self.config["Global"]["label_list"])
         return results
 
-
+det_predictor = DetPredictor(config)
 # 主体检测函数
-def bodydet(image,config=config):
-    det_predictor = DetPredictor(config)
-    img_orign = cv2.imread(image)
-    img = cv2.imread(image)[:, :, ::-1]
+
+def bodydet(image):
+    img = image[:, :, ::-1]
     output = det_predictor.predict(img)
     for res in output:
         boxes = [int(i) for i in res["bbox"]]
-        cv2.rectangle(img_orign, (boxes[0], boxes[1]), (boxes[2], boxes[3]), (255, 0, 0), 2)
-        cv2.imwrite("vis.jpg", img_orign)
+        cv2.rectangle(image, (boxes[0], boxes[1]), (boxes[2], boxes[3]), (255, 0, 0), 2)
+        # cv2.imwrite("vis.jpg", image)
     print(output)
-    return
+    return image
 
 
 
 
 if __name__ == "__main__":
     img='images/3.jpg'
-    bodydet(img)
+    img_orign = cv2.imread(img)
+    # bodydet(img_orign)
+
+    # 视频检测
+    video_path='images/1.mp4'
+    video = cv2.VideoCapture()
+    if not video.open(video_path):
+        print("can not open the video")
+        exit(1)
+    while True:
+        _, frame = video.read()
+        # print(frame)
+        if frame is None:
+            break
+        img=bodydet(frame)
+        cv2.imshow('video', img)  # 显示画面
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            break
+    video.release()  # 释放摄像头
+    cv2.destroyAllWindows()  # 释放所有显示图像窗口
+
+
